@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手机淘宝 - 电脑产品搜索</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background: linear-gradient(to right, #FF5000, #FF8000);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(255, 80, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            font-size: 18px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        
+        .title-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin-top: 8px;
+        }
+        
+        .search-bar i {
+            color: #ff5000;
+            margin-right: 8px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+        
+        .icon-btn {
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* 分类筛选 */
+        .category-filter {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px;
+            background: white;
+            scrollbar-width: none;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .category-filter::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-item {
+            flex: 0 0 auto;
+            padding: 8px 15px;
+            margin-right: 10px;
+            background: #f7f7f7;
+            border-radius: 15px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        
+        .category-item.active {
+            background: #ff5000;
+            color: white;
+        }
+        
+        /* 产品网格布局 */
+        .image-grid-section {
+            margin: 20px 0;
+            padding: 0 15px;
+        }
+        
+        .grid-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .grid-title i {
+            color: #FF5000;
+            margin-right: 10px;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .grid-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .grid-item:active {
+            transform: translateY(-3px);
+        }
+        
+        .grid-image {
+            height: 140px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .grid-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .grid-content {
+            padding: 12px;
+        }
+        
+        .product-brand {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .product-spec {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            color: #FF5000;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 8px 0 5px;
+        }
+        
+        .price-original {
+            color: #999;
+            font-size: 13px;
+            text-decoration: line-through;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        
+        .sold-count {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .grid-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            text-align: center;
+            background: linear-gradient(to right, #FF5000, #FF8000);
+            color: white;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .grid-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 底部导航栏 */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            max-width: 500px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .nav-item.active {
+            color: #ff5000;
+        }
+        
+        .nav-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 400px) {
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid-image {
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <div class="back-btn">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="title-area">
+            <div class="main-title">笔记本电脑</div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索笔记本电脑">
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="icon-btn">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 分类筛选 -->
+    <div class="category-filter">
+        <div class="category-item active">全部</div>
+        <div class="category-item">游戏本</div>
+        <div class="category-item">轻薄本</div>
+        <div class="category-item">设计本</div>
+        <div class="category-item">商务本</div>
+        <div class="category-item">RTX40系列</div>
+        <div class="category-item">高刷新率</div>
+        <div class="category-item">AMD</div>
+        <div class="category-item">Intel</div>
+    </div>
+    
+    <!-- 产品网格 -->
+    <div class="image-grid-section">
+        <div class="grid-title">
+            <i class="fas fa-laptop"></i>
+            笔记本电脑推荐
+        </div>
+        <div class="image-grid">
+            <!-- 产品1 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑1.png" alt="雷神911air猎荒者x笔记本电脑">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">雷神911air猎荒者x笔记本电脑</div>
+                    <div class="product-spec">显卡: NVIDIA GeForce</div>
+                    <div class="product-spec">CPU: 英特尔 酷睿 i7-13620H</div>
+                    <div class="product-spec">屏幕: 15.6英寸</div>
+                    <div class="product-price">¥5299<span class="price-original">¥5999</span></div>
+                    <div class="sold-count">已售2.3万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品2 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑2.png" alt="华为MateBook">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">华为MateBook</div>
+                    <div class="product-spec">显卡: 核芯显卡</div>
+                    <div class="product-spec">CPU: 英特尔 酷睿 i5-1135G7</div>
+                    <div class="product-spec">屏幕: 13英寸</div>
+                    <div class="product-price">¥5499<span class="price-original">¥5999</span></div>
+                    <div class="sold-count">已售5.6万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品3 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑3.png" alt="Lenovo/联想 Thinkpad">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">Lenovo/联想 Thinkpad</div>
+                    <div class="product-spec">显卡: NVIDIA GeForce gtx1650</div>
+                    <div class="product-spec">CPU: AMD R5 5600H</div>
+                    <div class="product-spec">屏幕: 14英寸</div>
+                    <div class="product-price">¥7499<span class="price-original">¥7999</span></div>
+                    <div class="sold-count">已售3.1万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品4 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑4.png" alt="Dell/戴尔Inspiron">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">Dell/戴尔Inspiron</div>
+                    <div class="product-spec">显卡: 集成显卡</div>
+                    <div class="product-spec">CPU: 英特尔 酷睿 i7-13620H</div>
+                    <div class="product-spec">屏幕: 16英寸</div>
+                    <div class="product-price">¥8499<span class="price-original">¥9999</span></div>
+                    <div class="sold-count">已售1.2万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品5 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑5.png" alt="华硕灵耀">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">华硕灵耀</div>
+                    <div class="product-spec">显卡: Intel Arc Graphics</div>
+                    <div class="product-spec">CPU: 英特尔 酷睿 Ultra9 285H</div>
+                    <div class="product-spec">屏幕: 14英寸</div>
+                    <div class="product-price">¥8499<span class="price-original">¥8999</span></div>
+                    <div class="sold-count">已售8千件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品6 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src=" images/电脑6.png">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">Apple</div>
+                    <div class="product-spec">显卡: 核芯显卡</div>
+                    <div class="product-spec">CPU: Apple M1</div>
+                    <div class="product-spec">屏幕: 13.3英寸</div>
+                    <div class="product-price">¥4499<span class="price-original">¥4999</span></div>
+                    <div class="sold-count">已售4.5万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品7 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑7.png">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">HP/惠普可选星Book</div>
+                    <div class="product-spec">显卡: NVIDIA GeForce MX150</div>
+                    <div class="product-spec">CPU: 英特尔 酷睿 i5-1135G7</div>
+                    <div class="product-spec">屏幕: 14英寸</div>
+                    <div class="product-price">¥2499<span class="price-original">¥2999</span></div>
+                    <div class="sold-count">已售3.8万件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+            
+            <!-- 产品8 -->
+            <div class="grid-item">
+                <div class="grid-image">
+                    <img src="images/电脑8.png">
+                </div>
+                <div class="grid-content">
+                    <div class="product-brand">Xiaomi/小米 笔记本Pro</div>
+                    <div class="product-spec">显卡: 英特尔 酷睿 i5-11300H</div>
+                    <div class="product-spec">CPU: NVIDIA GeForce MX450</div>
+                    <div class="product-spec">屏幕: 15.6英寸</div>
+                    <div class="product-price">¥4499<span class="price-original">¥4999</span></div>
+                    <div class="sold-count">已售5千件</div>
+                    <button class="grid-btn">立即购买</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="nav-bottom">
+        <div class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>首页</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-compass"></i>
+            <span>发现</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>购物车</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的淘宝</span>
+        </div>
+    </div>
+
+    <script>
+        // 简单的分类选择功能
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.category-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // 底部导航栏交互
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // 购买按钮交互
+        document.querySelectorAll('.grid-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                alert('已加入购物车');
+            });
+        });
+        
+        // 产品项点击交互
+        document.querySelectorAll('.grid-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const productName = this.querySelector('.product-brand').textContent;
+                alert(`查看商品详情: ${productName}`);
+            });
+        });
+    </script>
+</body>
+</html>
